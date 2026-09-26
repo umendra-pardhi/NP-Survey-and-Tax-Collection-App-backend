@@ -19,6 +19,11 @@ credentials in their request bodies. For an API running on the host, use
 `localhost` as `server`; for an API container connecting to this Compose
 database, use `postgres`. PostgreSQL listens on port 5432.
 
+The `/sync/local-to-remote/stream` endpoint accepts NDJSON in the request body.
+Pass the database username and password in the `X-DB-Username` and
+`X-DB-Password` headers, not in the URL. Use HTTPS when calling this endpoint
+outside a trusted local network.
+
 To run the API directly from the host:
 
 ```bash

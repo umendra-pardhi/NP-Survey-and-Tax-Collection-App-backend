@@ -1,6 +1,6 @@
 # app/sync_routes.py
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Header, Request
 from app.sync.schemas import (
     LocalToRemoteRequest,
     RemoteToLocalRequest, RemoteSyncRequest
@@ -36,10 +36,10 @@ async def sync_local_to_remote(
 async def sync_local_to_remote_stream(
     server: str,
     database: str,
-    db_username: str,
-    db_password: str,
     table_name: str,
-    request: Request
+    request: Request,
+    db_username: str = Header(..., alias="X-DB-Username"),
+    db_password: str = Header(..., alias="X-DB-Password"),
 ):
 
     SessionLocal, engine = create_dynamic_session(
@@ -49,13 +49,20 @@ async def sync_local_to_remote_stream(
             db_password
         )
 
-    db = SessionLocal()
-
-    return await SyncService.process_local_to_remote_stream(
-        db,
-        request,
-        table_name
-    )
+    db = None
+    try:
+        db = SessionLocal()
+        return await SyncService.process_local_to_remote_stream(
+            db,
+            request,
+            table_name
+        )
+    finally:
+        try:
+            if db is not None:
+                db.close()
+        finally:
+            engine.dispose()
 
 
 
