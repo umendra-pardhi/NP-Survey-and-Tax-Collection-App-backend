@@ -22,8 +22,8 @@ def connect_to_gramdb(
         try:
             with SessionLocal() as db:
                 result = db.execute(text('''
-                    SELECT loginid AS "LoginID", username AS "Username"
-                    FROM users
+                    SELECT [LoginID], [UserName]
+                    FROM [dbo].[Users]
                 '''))
                 clients = [dict(row) for row in result.mappings()]
         finally:
@@ -38,17 +38,17 @@ def connect_to_gramdb(
 
     except Exception as error:
         original_error = getattr(error, "orig", None)
-        sqlstate = getattr(original_error, "sqlstate", None)
         error_message = str(error).lower()
+        error_text = str(original_error or error)
 
-        if sqlstate == "3D000":
+        if "cannot open database" in error_message or "4060" in error_text:
             return {
                 "success": False,
                 "error_code": "DATABASE_NOT_FOUND",
                 "message": "Database does not exist"
             }
 
-        if sqlstate in {"28P01", "28000"}:
+        if "login failed" in error_message or "18456" in error_text:
             return {
                 "success": False,
                 "error_code": "INVALID_DB_CREDENTIALS",
@@ -59,12 +59,13 @@ def connect_to_gramdb(
             "could not translate host name" in error_message
             or "connection refused" in error_message
             or "could not connect" in error_message
+            or "08001" in error_text
             or "timeout" in error_message
         ):
             return {
                 "success": False,
                 "error_code": "SERVER_UNREACHABLE",
-                "message": "Unable to connect to PostgreSQL server"
+                "message": "Unable to connect to SQL Server"
             }
 
         return {

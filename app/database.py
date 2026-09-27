@@ -1,5 +1,3 @@
-import os
-
 from sqlalchemy import URL, create_engine
 from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
@@ -14,16 +12,17 @@ def create_dynamic_session(
     username: str,
     password: str
 ):
-    if server.strip().lower() == "postgres":
-        server = os.getenv("POSTGRES_HOST", server)
-
     database_url = URL.create(
-        "postgresql+psycopg",
+        "mssql+pyodbc",
         username=username,
         password=password,
         host=server,
-        port=5432,
         database=database,
+        query={
+            "driver": "ODBC Driver 18 for SQL Server",
+            "Encrypt": "yes",
+            "TrustServerCertificate": "yes",
+        },
     )
 
     engine = create_engine(
@@ -31,6 +30,7 @@ def create_dynamic_session(
         pool_pre_ping=True,
         pool_size=5,
         max_overflow=10,
+        fast_executemany=True,
     )
 
     SessionLocal = sessionmaker(

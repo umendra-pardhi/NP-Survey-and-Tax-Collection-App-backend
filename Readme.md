@@ -1,8 +1,9 @@
-## PostgreSQL setup
+## SQL Server setup
 
-The API uses PostgreSQL through SQLAlchemy and psycopg. Docker Compose starts
-PostgreSQL, loads `schema.postgres.sql` when the data volume is first created,
-and exposes PostgreSQL on port 5432 by default.
+The API connects to SQL Server through SQLAlchemy, `pyodbc`, and Microsoft ODBC
+Driver 18. Apply `schema.db.sql` to the target database before using the API.
+Docker Compose starts only the API; SQL Server is expected to be available
+separately.
 
 ```bash
 docker compose up --build
@@ -10,19 +11,21 @@ docker compose up --build
 ```
 only api : docker compose build api
 
-Set `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_PORT`, and
-`API_PORT` in `.env` to configure the services. The schema file is only applied
-when PostgreSQL initializes an empty data volume.
+Set `API_PORT` in `.env` to configure the API port. Database credentials are
+provided to the register, login, connectivity, and sync endpoints in each
+request.
 
-The register, login, connectivity, and sync endpoints still accept database
-credentials in their request bodies. For an API running on the host, use
-`localhost` as `server`; for an API container connecting to this Compose
-database, use `postgres`. PostgreSQL listens on port 5432.
+Use the SQL Server host name (or `host,port` / `host\\instance`) as `server`.
+When the API runs in Docker on Windows and SQL Server runs on the host, use
+`host.docker.internal` instead of `localhost`. The target schema is `dbo`.
 
 The `/sync/local-to-remote/stream` endpoint accepts NDJSON in the request body.
 Pass the database username and password in the `X-DB-Username` and
 `X-DB-Password` headers, not in the URL. Use HTTPS when calling this endpoint
 outside a trusted local network.
+
+Photo upload endpoints and request examples are documented in
+[photo-uploads-api.md](photo-uploads-api.md).
 
 To run the API directly from the host:
 

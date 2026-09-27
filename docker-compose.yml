@@ -1,41 +1,4 @@
 services:
-
-  postgres:
-    image: postgres:16-alpine
-    container_name: nagar-postgres
-
-    restart: unless-stopped
-
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-
-    ports:
-      - "${POSTGRES_PORT:-5432}:5432"
-
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-
-      # Runs automatically ONLY when the database
-      # is initialized for the first time.
-      - ./schema.postgres.sql:/docker-entrypoint-initdb.d/001-schema.sql:ro
-
-    healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"
-        ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-
-    networks:
-      - backend
-
-
   api:
     build:
       context: .
@@ -45,15 +8,11 @@ services:
 
     restart: unless-stopped
 
-    environment:
-      POSTGRES_HOST: postgres
-
-    depends_on:
-      postgres:
-        condition: service_healthy
-
     ports:
       - "${API_PORT:-8000}:8000"
+
+    volumes:
+      - photo_uploads:/app/uploads
 
     healthcheck:
       test:
@@ -73,8 +32,7 @@ services:
 
 
 volumes:
-  postgres_data:
-
+  photo_uploads:
 
 networks:
   backend:

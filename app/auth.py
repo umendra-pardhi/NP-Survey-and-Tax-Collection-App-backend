@@ -15,13 +15,13 @@ password_hash = PasswordHash.recommended()
 DUMMY_HASH = password_hash.hash("dummypassword")
 
 
-def hash_password(password: str) -> str:
-    return password_hash.hash(password)
+def hash_password(password: str) -> bytes:
+    return password_hash.hash(password).encode("utf-8")
 
 
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    print(password_hash.hash("Survey@123"))
-    print(password_hash.hash("Tax@123"))
+def verify_password(plain_password: str, hashed_password: bytes | str) -> bool:
+    if isinstance(hashed_password, bytes):
+        hashed_password = hashed_password.decode("utf-8")
     return password_hash.verify(plain_password, hashed_password)
 
 

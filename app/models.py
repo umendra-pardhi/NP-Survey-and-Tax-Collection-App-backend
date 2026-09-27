@@ -2,7 +2,8 @@ from sqlalchemy import (
     Column,
     Integer,
     String,
-    Boolean
+    Boolean,
+    LargeBinary,
 )
 
 from sqlalchemy.orm import declarative_base
@@ -12,22 +13,23 @@ Base = declarative_base()
 
 class User(Base):
 
-    __tablename__ = "users"
+    __tablename__ = "Users"
+    __table_args__ = {"schema": "dbo"}
 
-    UserID = Column("userid", Integer, primary_key=True, index=True)
+    UserID = Column("UserID", Integer, primary_key=True)
 
-    UserName = Column("username", String(50))
+    UserName = Column("UserName", String(50))
 
-    Mobile = Column("mobile", String(50))
+    Mobile = Column("Mobile", String(50))
 
-    EMail = Column("email", String(50), index=True)
+    EMail = Column("EMail", String(50))
 
-    LoginID = Column("loginid", String(50), unique=True, index=True)
+    LoginID = Column("LoginID", String(50))
 
-    Password = Column("Password", String(255))
+    Password = Column("Password", LargeBinary)
 
-    UserRole = Column("userrole", String(50))
+    UserRole = Column("UserRole", String(50))
 
-    UserLocation = Column("userlocation", Boolean)
+    UserLocation = Column("UserLocation", Boolean)
 
-    ClientID = Column("clientid", Integer)
+    ClientID = Column("ClientID", Integer)

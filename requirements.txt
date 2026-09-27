@@ -1,6 +1,6 @@
 fastapi[standard]
 sqlalchemy
-psycopg[binary]
+pyodbc
 pwdlib[argon2]
 PyJWT
 gunicorn

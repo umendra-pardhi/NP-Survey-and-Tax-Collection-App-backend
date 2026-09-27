@@ -2,6 +2,7 @@ from fastapi import FastAPI
 # from .database import Base, engine
 from .routes import router
 from .sync.routes import router as sync_router
+from .photos import router as photos_router
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 
@@ -38,3 +39,4 @@ async def health():
 
 app.include_router(router)
 app.include_router(sync_router)
+app.include_router(photos_router)
