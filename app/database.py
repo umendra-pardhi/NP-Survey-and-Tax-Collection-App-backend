@@ -77,7 +77,7 @@ def create_dynamic_session(
         pool_size=5,
         max_overflow=10,
         fast_executemany=True,
-        # connect_args={"timeout": 5},
+        connect_args={"timeout": 60},
     )
 
     try:
