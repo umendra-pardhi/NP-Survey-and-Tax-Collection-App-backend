@@ -74,7 +74,11 @@ def connect_to_gramdb(
             return {
                 "success": False,
                 "error_code": "SERVER_UNREACHABLE",
-                "message": "Unable to connect to SQL Server"
+                "message": (
+                    "Unable to connect to SQL Server. Check that the server address "
+                    "and port are correct, SQL Server allows remote connections, "
+                    "and port 1433 (or your instance port) is reachable from this machine."
+                ),
             }
 
         return {
