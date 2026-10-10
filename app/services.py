@@ -1,7 +1,7 @@
 from sqlalchemy import text
 
 from .database import create_dynamic_session
-
+import time
 
 def connect_to_gramdb(
     server,
@@ -10,25 +10,32 @@ def connect_to_gramdb(
     password
 ):
 
-
+    start = time.monotonic()
     try:
+        print("1. Creating engine:", time.monotonic() - start)
         SessionLocal, engine = create_dynamic_session(
             server,
             database,
             username,
             password,
         )
+        print("2. Engine created:", time.monotonic() - start)
 
         try:
             with SessionLocal() as db:
+                print("3. Session created:", time.monotonic() - start)
+                db.execute(text("SELECT 1"))
+                print("4. SELECT 1 completed:", time.monotonic() - start)
                 result = db.execute(text('''
                     SELECT [LoginID], [UserName]
                     FROM [dbo].[Users]
                 '''))
+                print("5. Users query completed:", time.monotonic() - start)
                 clients = [dict(row) for row in result.mappings()]
         finally:
             engine.dispose()
 
+        print("6. Everything completed:", time.monotonic() - start)
         return {
             "success": True,
             "message": "Database connected successfully",
@@ -37,6 +44,8 @@ def connect_to_gramdb(
         }
 
     except Exception as error:
+        print("ERROR after:", time.monotonic() - start, "seconds")
+        print("ERROR:", repr(error))
         original_error = getattr(error, "orig", None)
         error_message = str(error).lower()
         error_text = str(original_error or error)
